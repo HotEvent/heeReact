@@ -230,7 +230,7 @@ function useState(initial) {
   return [hook.state, setState];
 }
 
-function useService(initial) {
+function useService<T>(initial: () => T): T {
   // const oldHook =
   //   wipFiber.alternate &&
   //   wipFiber.alternate.hooks &&
@@ -358,8 +358,19 @@ function reconcileChildren(wipFiber, elements) {
 
 class Service {
   name = 'xiaoxiaoluo';
+  data = { fff: 0 };
   add() {
     this.name = this.name + '1';
+  }
+  fetchData() {
+    fetch(`/foo.json`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        this.data = res;
+        this.data.fff = Date.now();
+      });
   }
   constructor() {}
 }
@@ -372,11 +383,12 @@ function App(props) {
       <button
         onClick={(e) => {
           service.add();
+          service.fetchData();
         }}
       >
         +
       </button>
-      hi {service.name}
+      hi {service.name} {JSON.stringify(service.data)}
     </div>
   );
 }
