@@ -357,7 +357,7 @@ function reconcileChildren(wipFiber, elements) {
 }
 
 class Service {
-  name = 'xiaoxiaoluo';
+  name = 'xiaoxiaolu';
   data = { fff: 0 };
   add() {
     this.name = this.name + '1';
