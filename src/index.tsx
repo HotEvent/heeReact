@@ -1,3 +1,4 @@
+import 'zone.js';
 function createElement(type, props, ...children) {
   return {
     type,
@@ -24,6 +25,7 @@ const Didact = {
   createElement,
   render,
   useState,
+  useService,
 };
 
 function createDom(fiber) {
@@ -76,15 +78,46 @@ function updateDom(dom, prevProps, nextProps) {
     .forEach((name) => {
       dom[name] = nextProps[name];
     });
-
-  //Add event listeners
-  Object.keys(nextProps)
-    .filter(isEvent)
-    .filter(isNew(prevProps, nextProps))
-    .forEach((name) => {
-      const eventType = name.toLowerCase().substring(2);
-      dom.addEventListener(eventType, nextProps[name]);
+  Zone.current
+    .fork({
+      name: 'event',
+      onInvokeTask: function (
+        delegate,
+        current,
+        target,
+        task,
+        applyThis,
+        applyArgs,
+      ) {
+        delegate.invokeTask(target, task, applyThis, applyArgs);
+        wipRoot = {
+          dom: currentRoot.dom,
+          props: currentRoot.props,
+          alternate: currentRoot,
+        };
+        nextUnitOfWork = wipRoot;
+        deletions = [];
+        console.log('event');
+      },
+    })
+    .run(() => {
+      //Add event listeners
+      Object.keys(nextProps)
+        .filter(isEvent)
+        .filter(isNew(prevProps, nextProps))
+        .forEach((name) => {
+          const eventType = name.toLowerCase().substring(2);
+          dom.addEventListener(eventType, nextProps[name]);
+        });
     });
+  // //Add event listeners
+  // Object.keys(nextProps)
+  //   .filter(isEvent)
+  //   .filter(isNew(prevProps, nextProps))
+  //   .forEach((name) => {
+  //     const eventType = name.toLowerCase().substring(2);
+  //     dom.addEventListener(eventType, nextProps[name]);
+  //   });
 }
 
 function commitDeletion(fiber, domParent) {
@@ -197,6 +230,41 @@ function useState(initial) {
   return [hook.state, setState];
 }
 
+function useService(initial) {
+  // const oldHook =
+  //   wipFiber.alternate &&
+  //   wipFiber.alternate.hooks &&
+  //   wipFiber.alternate.hooks[hookIndex];
+  // const hook = {
+  //   state: oldHook ? oldHook.state : initial,
+  //   queue: [],
+  // };
+
+  // const actions = oldHook ? oldHook.queue : [];
+  // actions.forEach((action) => {
+  //   hook.state = action(hook.state);
+  // });
+
+  // const setState = (action) => {
+  //   hook.queue.push(action);
+  //   wipRoot = {
+  //     dom: currentRoot.dom,
+  //     props: currentRoot.props,
+  //     alternate: currentRoot,
+  //   };
+  //   nextUnitOfWork = wipRoot;
+  //   deletions = [];
+  // };
+  if (wipFiber?.alternate?.service) {
+    wipFiber.service = wipFiber?.alternate?.service;
+    return wipFiber.service;
+  } else {
+    const service = initial();
+    wipFiber.service = service;
+    return service;
+  }
+}
+
 function updateHostComponent(fiber) {
   // TODO add dom node
   if (!fiber.dom) {
@@ -288,18 +356,27 @@ function reconcileChildren(wipFiber, elements) {
   }
 }
 
+class Service {
+  name = 'xiaoxiaoluo';
+  add() {
+    this.name = this.name + '1';
+  }
+  constructor() {}
+}
+
 function App(props) {
-  const [age, setAge] = Didact.useState(0);
+  // const [age, setAge] = Didact.useState(0);
+  const service = useService(() => new Service());
   return (
     <div>
       <button
         onClick={(e) => {
-          setAge((age) => age + 1);
+          service.add();
         }}
       >
         +
       </button>
-      hi {age}
+      hi {service.name}
     </div>
   );
 }

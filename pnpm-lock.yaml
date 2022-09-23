@@ -86,6 +86,7 @@ specifiers:
   webpack-cli: ^4.9.2
   webpack-dev-server: 4.8.1
   webpack-merge: 5.8.0
+  zone.js: ^0.11.8
 
 dependencies:
   '@ant-design/icons': 4.7.0_sfoxds7t5ydpegc3knd667wn6m
@@ -133,6 +134,7 @@ dependencies:
   terser-webpack-plugin: 5.3.1_webpack@5.70.0
   ts-node: 10.8.0_s3cismmvluuyuogbac6se7rdsy
   uuid: 8.3.2
+  zone.js: 0.11.8
 
 devDependencies:
   '@pmmmwh/react-refresh-webpack-plugin': 0.5.5_4tnamfzzvgpak3hfwxwldmjehu
@@ -8094,3 +8096,9 @@ packages:
       compress-commons: 4.1.1
       readable-stream: 3.6.0
     dev: true
+
+  /zone.js/0.11.8:
+    resolution: {integrity: sha512-82bctBg2hKcEJ21humWIkXRlLBBmrc3nN7DFh5LGGhcyycO2S7FN8NmdvlcKaGFDNVL4/9kFLmwmInTavdJERA==}
+    dependencies:
+      tslib: 2.4.0
+    dev: false
